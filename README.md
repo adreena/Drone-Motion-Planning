@@ -61,8 +61,9 @@ Once model found the path and returned the waypoints, model does further optimiz
 
 Waypoints are then casted to integer and given a heading direction [code: planning_utils.py -> collinearity_check] 
 
-[GIF]
-
+<p align="center">
+<img src="./misc/moving.png" width="800" height="600">
+</p>
 
 ### Other experiments / Future works
 
