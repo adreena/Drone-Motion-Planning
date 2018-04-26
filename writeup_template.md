@@ -1,5 +1,5 @@
 ## Project: 3D Motion Planning
-![Quad Image](./misc/enroute.png =500x400)
+![Quad Image](./misc/enroute.png){:height="36px" width="36px"}
 
 ---
 The goals / steps of this project are the following:
