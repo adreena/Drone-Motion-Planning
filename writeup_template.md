@@ -26,57 +26,36 @@ To find a safe path from start to destination, drone needs to be aware of obstac
 
 Partitioning the grid into regions based on distance to obstacle centers helps identifying the edges in the graph to represent feasible paths for navigating around obstacles which is implemented using [Voronoi Diagram](https://en.wikipedia.org/wiki/Voronoi_diagram). Voronoi provide ridge_vertices which defines the midline in free space between the obstacles and is useful for creating an efficient graph of edges connecting the ridge_vertices. [Bresenham](https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm) method is an efficient way to determine the points connecting the ridge_vertices with a close approximation to a straight line. [code: planning_utils.py -> generate_graph]
 
-#### 2. Start , Destination and Path
+[Grid Image Placeholder]
+
+
+#### 3. Set Start/Goal
+
+The model is able to recieve global coordinates (latitude, longitude) information about the start and goal position and convert them to local coordinates by considering the obstacle grid offsets. [code: planning_utils.py -> localize_point]
+
+Then the closes points to these points on the graph are identified based on the minimum distance to the nodes. [code: planning_utils.py -> closest_point]
+
+
+#### 4. Path Searching
+
+Search algorithm used in this model is [A*](https://en.wikipedia.org/wiki/A*_search_algorithm), it searches among all possible paths to the goal for the minimum cost. It constructs a tree of paths from the starting node, expanding paths one step at a time, until one of its paths ends at the goal node by determining which of its partial paths to expand into one or more longer paths. Each partial path is assigned an estimate cost that's the sum of node's current_cost and the heuristic current_cost + path_cost + heuristic. Heuristic used in this model is the distance between goal and the node. [code: planning_utils.py -> a_star]
+
+#### 5. Path Pruning
+
+Once model found the path and returned the waypoints, model does further optimization using colliearnity which is to eliminate points that lie on a single straight line between 2 other points. Pruning reduces the number of uncessary stops/transitions for the drone.[code: planning_utils.py -> collinearity_check] 
+
+Waypoints are then casted to integer and given a heading direction [code: planning_utils.py -> collinearity_check] 
 
 
 And here's a lovely image of my results (ok this image has nothing to do with it, but it's a nice example of how to include images in your writeup!)
 ![Top Down View](./misc/high_up.png)
 
-Here's | A | Snappy | Table
---- | --- | --- | ---
-1 | `highlight` | **bold** | 7.41
-2 | a | b | c
-3 | *italic* | text | 403
-4 | 2 | 3 | abcd
 
-### Implementing Your Path Planning Algorithm
+### Other experiments / Future works
 
-#### 1. Set your global home position
-Here students should read the first line of the csv file, extract lat0 and lon0 as floating point values and use the self.set_home_position() method to set global home. Explain briefly how you accomplished this in your code.
+I experimented random sampling to generate 300 random points within the grid and removed the ones which were not in the safety distance from the obstacles. I then used KDTree to create a graph connecting the good nodes, there is a noticable processing time for this approach and I prefered using the grid solution. [code: random_path_planning.ipynb] 
+![Random Sampling](./misc/high_up.png)
 
 
-And here is a lovely picture of our downtown San Francisco environment from above!
-![Map of SF](./misc/map.png)
-
-#### 2. Set your current local position
-Here as long as you successfully determine your local position relative to global home you'll be all set. Explain briefly how you accomplished this in your code.
-
-
-Meanwhile, here's a picture of me flying through the trees!
-![Forest Flying](./misc/in_the_trees.png)
-
-#### 3. Set grid start position from local position
-This is another step in adding flexibility to the start location. As long as it works you're good to go!
-
-#### 4. Set grid goal position from geodetic coords
-This step is to add flexibility to the desired goal location. Should be able to choose any (lat, lon) within the map and have it rendered to a goal location on the grid.
-
-#### 5. Modify A* to include diagonal motion (or replace A* altogether)
-Minimal requirement here is to modify the code in planning_utils() to update the A* implementation to include diagonal motions on the grid that have a cost of sqrt(2), but more creative solutions are welcome. Explain the code you used to accomplish this step.
-
-#### 6. Cull waypoints 
-For this step you can use a collinearity test or ray tracing method like Bresenham. The idea is simply to prune your path of unnecessary waypoints. Explain the code you used to accomplish this step.
-
-
-
-### Execute the flight
-#### 1. Does it work?
-It works!
-
-### Double check that you've met specifications for each of the [rubric](https://review.udacity.com/#!/rubrics/1534/view) points.
-  
-# Extra Challenges: Real World Planning
-
-For an extra challenge, consider implementing some of the techniques described in the "Real World Planning" lesson. You could try implementing a vehicle model to take dynamic constraints into account, or implement a replanning method to invoke if you get off course or encounter unexpected obstacles.
 
 
