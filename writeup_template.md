@@ -51,7 +51,9 @@ Then the closes points to these points on the graph are identified based on the 
 
 Search algorithm used in this model is [A*](https://en.wikipedia.org/wiki/A*_search_algorithm), it searches among all possible paths to the goal for the minimum cost. It constructs a tree of paths from the starting node, expanding paths one step at a time, until one of its paths ends at the goal node by determining which of its partial paths to expand into one or more longer paths. Each partial path is assigned an estimate cost that's the sum of node's current_cost and the heuristic current_cost + path_cost + heuristic. Heuristic used in this model is the distance between goal and the node. [code: planning_utils.py -> a_star]
 
-![A* Search Path](./misc/voronoi_graph.png)
+<p align="center">
+<img src="./misc/voronoi_graph.png" width="600" height="400">
+</p>
 
 #### 5. Path Pruning
 
@@ -65,8 +67,9 @@ Waypoints are then casted to integer and given a heading direction [code: planni
 ### Other experiments / Future works
 
 I experimented random sampling to generate 300 random points within the grid and removed the ones which were not in the safety distance from the obstacles. I then used KDTree to create a graph connecting the good nodes, there is a noticable processing time for this approach and I prefered using the grid solution. [code: random_path_planning.ipynb] 
-![Random Sampling](./misc/random_sampling.png)
-
+<p align="center">
+<img src="./misc/random_sampling.png" width="600" height="400">
+</p>
 
 
 
