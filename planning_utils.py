@@ -6,6 +6,7 @@ from queue import PriorityQueue
 import sys
 import pkg_resources
 import networkx as nx
+from udacidrone.frame_utils import global_to_local, local_to_global
 
 def create_grid(data, drone_altitude, safety_distance):
     """
@@ -131,6 +132,9 @@ def a_star(graph, h, start, goal):
 def heuristic(position, goal_position):
     return np.linalg.norm(np.array(position) - np.array(goal_position))
 
+def localize_point(global_position, global_home, north_offset, east_offset):
+    local_position = global_to_local(global_position, global_home)
+    return (int(local_position[0]) - north_offset, int(local_position[1]) - east_offset)
 
 def closest_point(p,graph):
     min_dist = 1000000

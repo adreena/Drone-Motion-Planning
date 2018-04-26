@@ -5,11 +5,11 @@ from enum import Enum, auto
 
 import numpy as np
 
-from planning_utils_grid import a_star, heuristic, create_grid, closest_point, generate_graph, prune
+from planning_utils import a_star, heuristic, create_grid, closest_point, generate_graph, prune, localize_point
 from udacidrone import Drone
 from udacidrone.connection import MavlinkConnection
 from udacidrone.messaging import MsgID
-from udacidrone.frame_utils import global_to_local, local_to_global
+
 
 
 class States(Enum):
@@ -134,60 +134,52 @@ class MotionPlanning(Drone):
         
         # TODO: set home position to (lon0, lat0, 0)
         self.set_home_position(lon0,lat0,0)
-
-        # TODO: retrieve current global position
-        current_global_position = [self._longitude, self._latitude, self._altitude]
-        current_local_position = global_to_local(current_global_position, self.global_home)
-
         print('global home {0}, position {1}, local position {2}'.format(self.global_home, self.global_position,
                                                                           self.local_position))
+        
         # Read in obstacle map
         data = np.loadtxt('colliders.csv', delimiter=',', dtype='Float64', skiprows=2)
         
-        # Define a grid for a particular altitude and safety margin around obstacles
-        # grid, north_offset, east_offset = create_grid(data, TARGET_ALTITUDE, SAFETY_DISTANCE)
+        # Defining a grid for a particular altitude and safety margin around obstacles
         grid, centers, north_offset, east_offset = create_grid(data, TARGET_ALTITUDE, SAFETY_DISTANCE)
-
 
         print("North offset = {0}, east offset = {1}".format(north_offset, east_offset))
         
-        # Define starting point on the grid (this is just grid center)
-        grid_start = (int(current_local_position[0]) - north_offset, int(current_local_position[1]) - east_offset)
 
+        # Retrieve current global position and set it as starting point on the grid 
+        current_global_position = [self._longitude, self._latitude, self._altitude]
+        grid_start = localize_point(current_global_position, self.global_home, north_offset, east_offset )
+        
         # Set goal as some arbitrary position on the grid
         global_goal = (-122.39595777, 37.79301314, 0)
-        local_goal = global_to_local(global_goal, self.global_home)
-        grid_goal = (local_goal[0] - north_offset, local_goal[1] - east_offset )
+        grid_goal = localize_point(global_goal, self.global_home, north_offset, east_offset )
+
         
-        # 1- create a graph from the map using voronoi and bresenham
+        # create a graph from the map using voronoi and bresenham
         graph, edges = generate_graph(grid, centers)
 
-        # 2- find closest points to start & goal
+        # find closest points to start & goal
         start= closest_point(grid_start, graph)
         goal = closest_point(grid_goal, graph)
 
-        # # Run A* to find a path from start to goal
+
         print('Local Start and Goal: ', start, goal)
         
-
-        # print('Searching for a path...')
+        # Run A* to find a path from start to goal
+        print('Searching for a path...')
         path, cost = a_star(graph, heuristic, start, goal)
-        # # path.append(grid_start)
-        print('path cost:', cost)
+        print('Path cost:', cost)
 
-        # # TODO: prune path to minimize number of waypoints
-        # # TODO (if you're feeling ambitious): Try a different approach altogether!
-
-        # Convert path to waypoints
+        print("Pruning path to minimize number of waypoints ... ")
         path = prune(path)
 
-        # path = [(316, 445), (316, 446), (317, 446), (317, 447), (318, 447), (318, 448), (319, 448), (319, 449), (320, 449), (320, 450), (321, 450), (321, 451), (322, 451), (322, 452), (323, 452), (323, 453), (324, 453), (324, 454), (325, 454), (325, 455), (326, 455)]
 
         waypoints = [[p[0] + north_offset, p[1] + east_offset, TARGET_ALTITUDE, 0] for p in path]
         
         # Set self.waypoints
         self.waypoints = waypoints
-        # TODO: send waypoints to sim (this is just for visualization of waypoints)
+        
+        print("Sending waypoints to simulator")
         self.send_waypoints()
 
     def start(self):
