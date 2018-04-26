@@ -26,7 +26,17 @@ To find a safe path from start to destination, drone needs to be aware of obstac
 
 Partitioning the grid into regions based on distance to obstacle centers helps identifying the edges in the graph to represent feasible paths for navigating around obstacles which is implemented using [Voronoi Diagram](https://en.wikipedia.org/wiki/Voronoi_diagram). Voronoi provide ridge_vertices which defines the midline in free space between the obstacles and is useful for creating an efficient graph of edges connecting the ridge_vertices. [Bresenham](https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm) method is an efficient way to determine the points connecting the ridge_vertices with a close approximation to a straight line. [code: planning_utils.py -> generate_graph]
 
-![Obstcale Grid](./misc/obstacle_map.png)
+<table style="width:100%">
+  <tr>
+    <th>Simulator</th>
+    <th>Obstacle Grid</th>
+  </tr>
+  <tr>
+    <td><img src="./misc/high_up.png" width="500" height="400"/></td>
+    <td><img src="./misc/obstacle_map.png" width="500" height="400"/></td>
+  </tr>
+</table>
+
 
 
 #### 3. Set Start/Goal
@@ -48,9 +58,7 @@ Once model found the path and returned the waypoints, model does further optimiz
 
 Waypoints are then casted to integer and given a heading direction [code: planning_utils.py -> collinearity_check] 
 
-
-And here's a lovely image of my results (ok this image has nothing to do with it, but it's a nice example of how to include images in your writeup!)
-![Top Down View](./misc/high_up.png)
+[GIF]
 
 
 ### Other experiments / Future works
