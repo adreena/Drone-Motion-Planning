@@ -1,6 +1,6 @@
 ## Project: 3D Motion Planning
 <p align="center">
-<img src="./misc/enroute.png" width="600" height="600">
+<img src="./misc/enroute.png" width="800" height="600">
 </p>
 ---
 The goals / steps of this project are the following:
