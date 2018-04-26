@@ -24,7 +24,7 @@ Model is listening to multiple events including changes in local position, local
 
 To find a safe path from start to destination, drone needs to be aware of obstacles in its surrounding and this information is provided in `colliders.csv` file which contains the 2.5D map of the simulator environment. The initial step is to create a grid of obstalces and localize coordinates to the grid. [code: planning_utils.py -> create_grid]
 
-Partitioning the grid into regions based on distance to obstacle centers helps identifying the edges in the graph to represent feasible paths for navigating around obstacles which is performed using [Voronoi Diagram](https://en.wikipedia.org/wiki/Voronoi_diagram). [code: planning_utils.py -> generate_graph]  
+Partitioning the grid into regions based on distance to obstacle centers helps identifying the edges in the graph to represent feasible paths for navigating around obstacles which is implemented using [Voronoi Diagram](https://en.wikipedia.org/wiki/Voronoi_diagram). Voronoi provide ridge_vertices which defines the midline in free space between the obstacles and is useful for creating an efficient graph of edges connecting the ridge_vertices. [Bresenham](https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm) method is an efficient way to determine the points connecting the ridge_vertices with a close approximation to a straight line. [code: planning_utils.py -> generate_graph]
 
 #### 2. Start , Destination and Path
 
