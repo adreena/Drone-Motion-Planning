@@ -2,32 +2,32 @@
 ![Quad Image](./misc/enroute.png)
 
 ---
+The goals / steps of this project are the following:
 
-
-# Required Steps for a Passing Submission:
-1. Load the 2.5D map in the colliders.csv file describing the environment.
-2. Discretize the environment into a grid or graph representation.
-3. Define the start and goal locations.
-4. Perform a search using A* or other search algorithm.
-5. Use a collinearity test or ray tracing method (like Bresenham) to remove unnecessary waypoints.
-6. Return waypoints in local ECEF coordinates (format for `self.all_waypoints` is [N, E, altitude, heading], where the drone’s start location corresponds to [0, 0, 0, 0].
-7. Write it up.
-8. Congratulations!  Your Done!
-
-## [Rubric](https://review.udacity.com/#!/rubrics/1534/view) Points
-### Here I will consider the rubric points individually and describe how I addressed each point in my implementation.  
-
+ - Step 1: collecting obstacles data
+ - Step 2: creating a grid based on obstacles information and localizing the coordinates
+ - Step 3: partitioning the grid into regions based on distance to obstacle centers, the edges in the graph represent feasible paths to navigate around those point obstacles 
+ - Step 4: Setting feasible start/goal points within the grid region
+ - Step 5: performing a search algorithm to find a directed path between start and goal using heuristics
+ - Step 6: pruning the path to improve drone motions 
+ 
 ---
-### Writeup / README
+### Model Architecture
 
-#### 1. Provide a Writeup / README that includes all the rubric points and how you addressed each one.  You can submit your writeup as markdown or pdf.  
+The main scripts are provided in `motion_planning.py` and `planning_utils.py`. 
 
-You're reading it! Below I describe how I addressed each rubric point and where in my code each point is handled.
+#### 1. Model states
 
-### Explain the Starter Code
+Model is listening to multiple events including changes in local position, local velocity and states. The simulated drone follows a sequence of state changes to be functioning properly by first going to MANUAL, then ARMING so the rotors start wrking and at that state it is ready to plan on how to get a destination form its current location as starting point and take off. After reaching the destination it would disarm and land in the goal point.
 
-#### 1. Explain the functionality of what's provided in `motion_planning.py` and `planning_utils.py`
-These scripts contain a basic planning implementation that includes...
+#### 2. Obstacles
+
+To find a safe path from start to destination, drone needs to be aware of obstacles in its surrounding and this information is provided in `colliders.csv` file which contains the 2.5D map of the simulator environment. The initial step is to create a grid of obstalces and localize coordinates to the grid. [code: planning_utils.py -> create_grid]
+
+Partitioning the grid into regions based on distance to obstacle centers helps identifying the edges in the graph to represent feasible paths for navigating around obstacles which is performed using [Voronoi Diagram](https://en.wikipedia.org/wiki/Voronoi_diagram). [code: planning_utils.py -> generate_graph]  
+
+#### 2. Start , Destination and Path
+
 
 And here's a lovely image of my results (ok this image has nothing to do with it, but it's a nice example of how to include images in your writeup!)
 ![Top Down View](./misc/high_up.png)
